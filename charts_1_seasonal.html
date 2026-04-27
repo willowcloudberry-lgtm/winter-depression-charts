@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winter Depression: Chronicles - Seasonal Charts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; padding: 2rem 1.5rem; max-width: 800px; margin: 0 auto; }
+  .chart-block { margin-bottom: 3rem; }
+  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #1a1a1a; }
+  .chart-sub { font-size: 12px; color: #666; margin-bottom: 12px; }
+  .chart-wrap { position: relative; width: 100%; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; font-size: 11px; color: #555; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .ld { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  #strip { display: flex; width: 100%; height: 12px; margin-top: 3px; border-radius: 2px; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<div class="chart-block">
+  <p class="chart-title">Tiredness over time</p>
+  <p class="chart-sub">Daily average tiredness, February-March 2026 (1 = great, 10 = exhausted). Gaps where no data was recorded. Colour strip shows weather each day.</p>
+  <div class="legend">
+    <span><span class="ld" style="background:#F7C575"></span>sunny</span>
+    <span><span class="ld" style="background:#B4B2A9"></span>grey / dark</span>
+    <span><span class="ld" style="background:#B5D4F4"></span>snow / white sky</span>
+    <span><span class="ld" style="background:#C0DD97"></span>mixed</span>
+    <span><span class="ld" style="background:#E8E6DF"></span>no data</span>
+  </div>
+  <div class="chart-wrap" style="height:240px;">
+    <canvas id="c1"></canvas>
+  </div>
+  <div id="strip"></div>
+</div>
+
+<div class="chart-block">
+  <p class="chart-title">Average tiredness: days inside vs days outside</p>
+  <p class="chart-sub">Average tiredness on days spent entirely indoors vs days that included time outside.</p>
+  <div class="chart-wrap" style="height:260px;">
+    <canvas id="c2"></canvas>
+  </div>
+</div>
+
+<script>
+const days = [
+  {l:"Feb 01",t:4.75,w:"grey"},{l:"Feb 02",t:2.5,w:"sunny"},{l:"Feb 03",t:5.0,w:"sunny"},
+  {l:"Feb 04",t:null,w:"none"},{l:"Feb 05",t:null,w:"none"},{l:"Feb 06",t:null,w:"none"},
+  {l:"Feb 07",t:null,w:"none"},{l:"Feb 08",t:5.75,w:"none"},{l:"Feb 09",t:6.5,w:"grey"},
+  {l:"Feb 10",t:4.0,w:"grey"},{l:"Feb 11",t:6.5,w:"sunny"},{l:"Feb 12",t:7.17,w:"sunny"},
+  {l:"Feb 13",t:4.0,w:"white"},{l:"Feb 14",t:2.0,w:"grey"},{l:"Feb 15",t:3.5,w:"snow"},
+  {l:"Feb 16",t:null,w:"grey"},{l:"Feb 17",t:3.75,w:"sunny"},{l:"Feb 18",t:5.0,w:"sunny"},
+  {l:"Feb 19",t:6.0,w:"mixed"},{l:"Feb 20",t:5.0,w:"grey"},{l:"Feb 21",t:5.75,w:"snow"},
+  {l:"Feb 22",t:2.0,w:"sunny"},{l:"Feb 23",t:1.5,w:"mixed"},{l:"Feb 24",t:1.0,w:"sunny"},
+  {l:"Feb 25",t:5.33,w:"grey"},{l:"Feb 26",t:5.0,w:"grey"},{l:"Feb 27",t:5.5,w:"white"},
+  {l:"Feb 28",t:5.0,w:"white"},{l:"Mar 01",t:4.5,w:"grey"},{l:"Mar 02",t:5.0,w:"grey"},
+  {l:"Mar 03",t:5.5,w:"grey"},{l:"Mar 04",t:3.5,w:"sunny"},{l:"Mar 05",t:6.25,w:"sunny"},
+  {l:"Mar 06",t:3.0,w:"sunny"},{l:"Mar 07",t:1.5,w:"snow"},{l:"Mar 08",t:2.5,w:"sunny"},
+  {l:"Mar 09",t:2.67,w:"sunny"},{l:"Mar 10",t:2.0,w:"sunny"},{l:"Mar 11",t:1.0,w:"sunny"},
+  {l:"Mar 12",t:3.67,w:"sunny"},{l:"Mar 13",t:5.0,w:"sunny"},{l:"Mar 14",t:6.0,w:"sunny"},
+  {l:"Mar 15",t:null,w:"sunny"},{l:"Mar 16",t:null,w:"sunny"},{l:"Mar 17",t:null,w:"sunny"},
+  {l:"Mar 18",t:null,w:"sunny"},{l:"Mar 19",t:null,w:"sunny"},{l:"Mar 20",t:null,w:"sunny"},
+  {l:"Mar 21",t:null,w:"sunny"},{l:"Mar 22",t:null,w:"sunny"},{l:"Mar 23",t:null,w:"sunny"},
+  {l:"Mar 24",t:null,w:"sunny"},{l:"Mar 25",t:null,w:"sunny"},{l:"Mar 26",t:null,w:"sunny"},
+  {l:"Mar 27",t:5.0,w:"sunny"},{l:"Mar 28",t:5.0,w:"sunny"},{l:"Mar 29",t:0.5,w:"sunny"},
+  {l:"Mar 30",t:4.5,w:"sunny"}
+];
+
+const wColor = {sunny:"#F7C575",grey:"#B4B2A9",snow:"#B5D4F4",white:"#B5D4F4",mixed:"#C0DD97",none:"#E8E6DF"};
+
+new Chart(document.getElementById("c1"), {
+  type: "line",
+  data: {
+    labels: days.map(d => d.l),
+    datasets: [{
+      data: days.map(d => d.t),
+      borderColor: "#0F6E56",
+      backgroundColor: "rgba(15,110,86,0.07)",
+      fill: true, tension: 0.35, pointRadius: 3,
+      pointBackgroundColor: "#0F6E56", pointBorderColor: "#0F6E56",
+      spanGaps: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      y: { min: 0, max: 10, ticks: { stepSize: 2, font: { size: 11 } } },
+      x: { ticks: { font: { size: 9 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 20 } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `tiredness: ${c.raw}` } } }
+  }
+});
+
+const strip = document.getElementById("strip");
+const pw = 100 / days.length;
+days.forEach(d => {
+  const b = document.createElement("div");
+  b.style.cssText = `flex:0 0 ${pw}%;height:100%;background:${wColor[d.w]}`;
+  b.title = `${d.l}: ${d.w}`;
+  strip.appendChild(b);
+});
+
+new Chart(document.getElementById("c2"), {
+  type: "bar",
+  data: {
+    labels: ["stayed inside", "went outside"],
+    datasets: [{ data: [4.6, 2.6], backgroundColor: ["#F0997B", "#1D9E75"], borderRadius: 4, borderSkipped: false }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      y: { min: 0, max: 8, ticks: { stepSize: 1, font: { size: 11 } }, title: { display: true, text: "avg tiredness", font: { size: 11 } } },
+      x: { ticks: { font: { size: 13 } } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `avg tiredness: ${c.raw}` } } }
+  }
+});
+</script>
+</body>
+</html>

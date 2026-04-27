@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winter Depression: Chronicles - Activity Charts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; padding: 2rem 1.5rem; max-width: 800px; margin: 0 auto; }
+  .chart-block { margin-bottom: 3rem; }
+  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #1a1a1a; }
+  .chart-sub { font-size: 12px; color: #666; margin-bottom: 12px; }
+  .chart-wrap { position: relative; width: 100%; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; font-size: 11px; color: #555; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .ld { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .alabel { font-size: 11px; width: 150px; text-align: right; color: #1a1a1a; flex-shrink: 0; }
+  .bar-wrap { flex: 1; position: relative; height: 18px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+  .bar { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 6px; font-size: 10px; color: white; box-sizing: border-box; white-space: nowrap; }
+  .month-line { font-size: 10px; color: #999; margin: 4px 0 6px 158px; border-top: 1px dashed #ddd; padding-top: 3px; }
+  .note { font-size: 10px; color: #999; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<!-- CHART 1: Hours by activity -->
+<div class="chart-block">
+  <p class="chart-title">Total hours per activity</p>
+  <p class="chart-sub">February-March 2026. Colours grouped by activity type.</p>
+  <div class="legend">
+    <span><span class="ld" style="background:#534AB7"></span>Creative / Active</span>
+    <span><span class="ld" style="background:#378ADD"></span>Semi-active</span>
+    <span><span class="ld" style="background:#A32D2D"></span>Passive</span>
+    <span><span class="ld" style="background:#D85A30"></span>Active Consumption</span>
+    <span><span class="ld" style="background:#888780"></span>Rest</span>
+  </div>
+  <div class="chart-wrap" style="height:300px;">
+    <canvas id="c1"></canvas>
+  </div>
+</div>
+
+<!-- CHART 2: First appearance timeline -->
+<div class="chart-block">
+  <p class="chart-title">When each activity first appeared</p>
+  <p class="chart-sub">Left edge = first recorded day.</p>
+
+  <div class="month-line">-- February --</div>
+  <div class="row"><span class="alabel">Letterboxd lists</span><div class="bar-wrap"><div class="bar" style="width:100%;background:#534AB7">Feb 01</div></div></div>
+  <div class="row"><span class="alabel">YouTube</span><div class="bar-wrap"><div class="bar" style="width:100%;background:#A32D2D">Feb 01</div></div></div>
+  <div class="row"><span class="alabel">Movies</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 24%);margin-left:24%;background:#D85A30">Feb 15</div></div></div>
+  <div class="row"><span class="alabel">Word games</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 26%);margin-left:26%;background:#378ADD">Feb 16</div></div></div>
+  <div class="row"><span class="alabel">Steam</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 45%);margin-left:45%;background:#378ADD">Feb 27</div></div></div>
+  <div class="row"><span class="alabel">TV shows</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 47%);margin-left:47%;background:#378ADD">Feb 28</div></div></div>
+  <div class="month-line">-- March --</div>
+  <div class="row"><span class="alabel">Football</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 49%);margin-left:49%;background:#D85A30">Mar 01*</div></div></div>
+  <div class="row"><span class="alabel">Games</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 55%);margin-left:55%;background:#534AB7">Mar 05</div></div></div>
+  <div class="row"><span class="alabel">Reading longreads</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 72%);margin-left:72%;background:#378ADD">Mar 18</div></div></div>
+  <div class="row"><span class="alabel">Research & Planning</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 80%);margin-left:80%;background:#534AB7">Mar 23</div></div></div>
+  <div class="row"><span class="alabel">Sleep</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 90%);margin-left:90%;background:#888780">Mar 27</div></div></div>
+  <div class="row"><span class="alabel">Historical research</span><div class="bar-wrap"><div class="bar" style="width:calc(100% - 92%);margin-left:92%;background:#534AB7">Mar 28</div></div></div>
+  <p class="note">* football was watched earlier but not recorded</p>
+</div>
+
+<!-- CHART 3: Feb vs March stacked bar -->
+<div class="chart-block">
+  <p class="chart-title">Activity type mix: February vs March</p>
+  <p class="chart-sub">Hours by activity type, February vs March 2026.</p>
+  <div class="legend">
+    <span><span class="ld" style="background:#534AB7"></span>Creative / Active</span>
+    <span><span class="ld" style="background:#378ADD"></span>Semi-active</span>
+    <span><span class="ld" style="background:#A32D2D"></span>Passive</span>
+    <span><span class="ld" style="background:#D85A30"></span>Active Consumption</span>
+    <span><span class="ld" style="background:#888780"></span>Rest</span>
+  </div>
+  <div class="chart-wrap" style="height:180px;">
+    <canvas id="c3"></canvas>
+  </div>
+</div>
+
+<script>
+// Chart 1: Hours by activity
+const actData = [
+  { label: "Letterboxd lists", hours: 77.8, color: "#534AB7" },
+  { label: "YouTube", hours: 51.0, color: "#A32D2D" },
+  { label: "Word games", hours: 47.5, color: "#378ADD" },
+  { label: "TV shows", hours: 20.5, color: "#378ADD" },
+  { label: "Movies", hours: 20.0, color: "#D85A30" },
+  { label: "Games", hours: 10.0, color: "#534AB7" },
+  { label: "Football", hours: 9.5, color: "#D85A30" },
+  { label: "Reading longreads", hours: 8.0, color: "#378ADD" },
+  { label: "Research & Planning", hours: 7.5, color: "#534AB7" },
+  { label: "Steam", hours: 7.0, color: "#378ADD" },
+  { label: "Sleep", hours: 5.0, color: "#888780" },
+  { label: "Historical research", hours: 4.5, color: "#534AB7" }
+];
+
+new Chart(document.getElementById("c1"), {
+  type: "bar",
+  data: {
+    labels: actData.map(d => d.label),
+    datasets: [{ data: actData.map(d => d.hours), backgroundColor: actData.map(d => d.color + "CC") }]
+  },
+  options: {
+    indexAxis: "y", responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { ticks: { font: { size: 11 } }, title: { display: true, text: "hours", font: { size: 11 } } },
+      y: { ticks: { font: { size: 11 } } }
+    },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw}h` } } }
+  }
+});
+
+// Chart 3: Feb vs March
+new Chart(document.getElementById("c3"), {
+  type: "bar",
+  data: {
+    labels: ["February", "March"],
+    datasets: [
+      { label: "Creative / Active", data: [71.5, 30.3], backgroundColor: "#534AB7CC" },
+      { label: "Semi-active", data: [38, 50.5], backgroundColor: "#378ADDCC" },
+      { label: "Passive", data: [43, 24], backgroundColor: "#A32D2DCC" },
+      { label: "Active Consumption", data: [0, 6], backgroundColor: "#D85A30CC" },
+      { label: "Rest", data: [0, 5], backgroundColor: "#888780CC" }
+    ]
+  },
+  options: {
+    indexAxis: "y", responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { stacked: true, ticks: { font: { size: 11 } }, title: { display: true, text: "hours", font: { size: 11 } } },
+      y: { stacked: true, ticks: { font: { size: 13 } } }
+    },
+    plugins: {
+      legend: { display: true, position: "bottom", labels: { font: { size: 11 }, boxWidth: 12 } },
+      tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.raw}h` } }
+    }
+  }
+});
+</script>
+</body>
+</html>

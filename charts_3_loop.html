@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winter Depression: Chronicles - Loop Theory</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #1a1a1a; padding: 2rem 1.5rem; max-width: 800px; margin: 0 auto; }
+  .chart-block { margin-bottom: 3rem; }
+  .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #1a1a1a; }
+  .chart-sub { font-size: 12px; color: #666; margin-bottom: 12px; }
+  .chart-wrap { position: relative; width: 100%; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; font-size: 11px; color: #555; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .ld { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="chart-block">
+  <p class="chart-title">Loop intensity vs tiredness</p>
+  <p class="chart-sub">x = max hours on one activity | y = tiredness | bubble size = total hours that day | colour = dominant activity. Hover over bubbles for details.</p>
+  <div class="legend">
+    <span><span class="ld" style="background:#534AB7"></span>Letterboxd</span>
+    <span><span class="ld" style="background:#A32D2D"></span>YouTube</span>
+    <span><span class="ld" style="background:#378ADD"></span>Word games</span>
+    <span><span class="ld" style="background:#1D9E75"></span>Games / Movies</span>
+    <span><span class="ld" style="background:#888780"></span>other</span>
+  </div>
+  <div class="chart-wrap" style="height:400px;">
+    <canvas id="c1"></canvas>
+  </div>
+</div>
+
+<script>
+const bdata = [
+  {date:"Feb 01",t:4.75,maxH:3.0,totalH:5.0,top:"YouTube"},
+  {date:"Feb 02",t:2.5,maxH:2.0,totalH:3.0,top:"Letterboxd lists"},
+  {date:"Feb 03",t:5.0,maxH:3.0,totalH:6.0,top:"Letterboxd lists"},
+  {date:"Feb 08",t:5.75,maxH:4.0,totalH:5.0,top:"Letterboxd lists"},
+  {date:"Feb 09",t:6.5,maxH:1.0,totalH:1.0,top:"YouTube"},
+  {date:"Feb 10",t:4.0,maxH:6.0,totalH:8.0,top:"Letterboxd lists"},
+  {date:"Feb 11",t:6.5,maxH:3.0,totalH:4.0,top:"Letterboxd lists"},
+  {date:"Feb 12",t:7.17,maxH:1.0,totalH:1.0,top:"YouTube"},
+  {date:"Feb 13",t:4.0,maxH:6.0,totalH:8.0,top:"Letterboxd lists"},
+  {date:"Feb 14",t:2.0,maxH:7.0,totalH:9.5,top:"Letterboxd lists"},
+  {date:"Feb 15",t:3.5,maxH:8.0,totalH:10.0,top:"Letterboxd lists"},
+  {date:"Feb 17",t:3.75,maxH:2.0,totalH:5.5,top:"Letterboxd lists"},
+  {date:"Feb 18",t:5.0,maxH:2.5,totalH:6.5,top:"YouTube"},
+  {date:"Feb 19",t:6.0,maxH:5.0,totalH:8.5,top:"Letterboxd lists"},
+  {date:"Feb 20",t:5.0,maxH:3.0,totalH:6.0,top:"Letterboxd lists"},
+  {date:"Feb 21",t:5.75,maxH:3.0,totalH:6.0,top:"Letterboxd lists"},
+  {date:"Feb 22",t:2.0,maxH:3.0,totalH:7.0,top:"Letterboxd lists"},
+  {date:"Feb 23",t:1.5,maxH:3.5,totalH:7.5,top:"YouTube"},
+  {date:"Feb 24",t:1.0,maxH:3.0,totalH:6.0,top:"Word games"},
+  {date:"Feb 25",t:5.33,maxH:2.0,totalH:4.0,top:"Word games"},
+  {date:"Feb 26",t:5.0,maxH:4.0,totalH:6.5,top:"Word games"},
+  {date:"Feb 27",t:5.5,maxH:4.0,totalH:10.0,top:"Word games"},
+  {date:"Feb 28",t:5.0,maxH:3.0,totalH:5.0,top:"Steam"},
+  {date:"Mar 01",t:4.5,maxH:4.0,totalH:7.5,top:"Football"},
+  {date:"Mar 02",t:5.0,maxH:4.0,totalH:6.3,top:"TV shows"},
+  {date:"Mar 03",t:5.5,maxH:2.0,totalH:3.0,top:"TV shows"},
+  {date:"Mar 04",t:3.5,maxH:2.0,totalH:4.0,top:"Football"},
+  {date:"Mar 05",t:6.25,maxH:3.0,totalH:7.0,top:"Games"},
+  {date:"Mar 06",t:3.0,maxH:3.0,totalH:5.5,top:"Games"},
+  {date:"Mar 07",t:1.5,maxH:4.0,totalH:8.0,top:"Games"},
+  {date:"Mar 08",t:2.5,maxH:5.0,totalH:6.0,top:"Movies"},
+  {date:"Mar 09",t:2.67,maxH:0.5,totalH:0.5,top:"YouTube"},
+  {date:"Mar 10",t:2.0,maxH:1.0,totalH:1.0,top:"Word games"},
+  {date:"Mar 11",t:1.0,maxH:2.0,totalH:2.0,top:"Word games"},
+  {date:"Mar 12",t:3.67,maxH:2.0,totalH:2.5,top:"Movies"},
+  {date:"Mar 13",t:5.0,maxH:2.0,totalH:5.5,top:"Letterboxd lists"},
+  {date:"Mar 14",t:6.0,maxH:2.0,totalH:2.0,top:"YouTube"},
+  {date:"Mar 27",t:5.0,maxH:2.0,totalH:4.0,top:"Word games"},
+  {date:"Mar 28",t:5.0,maxH:3.0,totalH:6.5,top:"Sleep"},
+  {date:"Mar 29",t:0.5,maxH:1.5,totalH:1.5,top:"Historical research"},
+  {date:"Mar 30",t:4.5,maxH:1.0,totalH:2.0,top:"Historical research"}
+];
+
+const ac = a => {
+  if (a === "Letterboxd lists") return "#534AB7CC";
+  if (a === "YouTube") return "#A32D2DCC";
+  if (a === "Word games") return "#378ADDCC";
+  if (a === "Games" || a === "Movies") return "#1D9E75CC";
+  return "#888780CC";
+};
+
+new Chart(document.getElementById("c1"), {
+  type: "bubble",
+  data: {
+    datasets: [{
+      data: bdata.map(d => ({ x: d.maxH, y: d.t, r: Math.max(5, d.totalH * 2.5), date: d.date, top: d.top, totalH: d.totalH })),
+      backgroundColor: bdata.map(d => ac(d.top)),
+      borderColor: "transparent"
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    layout: { padding: { top: 10, right: 10 } },
+    scales: {
+      x: { min: 0, max: 9, title: { display: true, text: "max hours on one activity", font: { size: 12 } }, ticks: { font: { size: 11 } } },
+      y: { min: 0, max: 8, title: { display: true, text: "avg tiredness", font: { size: 12 } }, ticks: { stepSize: 1, font: { size: 11 } } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: c => [
+            `${c.raw.date} - ${c.raw.top}`,
+            `max: ${c.raw.x}h, total: ${c.raw.totalH}h, tiredness: ${c.raw.y}`
+          ]
+        }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
